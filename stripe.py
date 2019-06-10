@@ -37,8 +37,8 @@ class StripeChecker():
         self.purchase = "https://puppetcombo.itch.io/nun-massacre/purchase"
         self.stripe_tokens = "https://api.stripe.com/v1/tokens"
 
-        print("\n\n  {}------=[ {}CODEKILLER CHECKER {}]=------".format(fg[0], fg[1], fg[0]))
-        print("      {}--= {}Created by Codekiller {}=--          ".format(fg[0], fg[1], fg[0]))
+        print("\n\n  {}------=[ {}HIZE CHECKER {}]=------".format(fg[0], fg[1], fg[0]))
+        print("      {}--= {}DOWNLOADED BY HIZE {}=--          ".format(fg[0], fg[1], fg[0]))
         print("  {}------========================------\n".format(fg[0]))
         self.check()
 
