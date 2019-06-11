@@ -144,7 +144,7 @@ class StripeChecker():
                 "csrf_token": csrf,
                 "card_token": tok_id,
                 "bp": "1352c97c578a5257f528baee67eecf68",
-                "email": "ckknocktoyou@gmail.com",
+                "email": "unknownprosuj@gmail.com",
                 "name": Username
             }
             result_response = session.post(checkout_url, proxies=proxy, data=result_data).text
