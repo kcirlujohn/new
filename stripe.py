@@ -111,7 +111,7 @@ class StripeChecker():
                 "initiator": "game",
                 "bp": "1352c97c578a5257f528baee67eecf68",
                 "price": "$4.95",
-                "email": "ckknocktoyou@gmail.com",
+                "email": "pukimon@gmail.com",
                 "json": "true"
             }
             purchase_response = json.loads(session.post(self.purchase, data=purchase_data, proxies=proxy).text)
