@@ -151,7 +151,7 @@ class StripeChecker():
             print()
             try:
                 error = BeautifulSoup(result_response, 'html.parser')
-                error_msg = error.find('div', {'class': 'form_errors'}).text()
+                error_msg = error.find('div', {'class': 'form_errors'})
 
                 if error_msg == "Your card's security code is incorrect.":
                     print(fg[1] + "AsianPro[ " + credit_card + " ]---(" + str(credit_entry) + ")")
