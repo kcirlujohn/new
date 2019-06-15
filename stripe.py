@@ -77,5 +77,4 @@ def StripeAutomate(credit_card, firstname="Kardur", lastname="Sosayati"):
 cc = open('cc.txt', 'r')
 credit_cards = cc.read()
 for x in credit_cards.split('\n'):
-    StripeAutomate(x, 'Odec', "Rillek")
 
